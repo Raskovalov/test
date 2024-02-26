@@ -65,9 +65,11 @@ void ReadGraph() {
 
 void StartSerchGraph() {
 	int events = 0;
+	char* c = NULL;
+	char* c1 = NULL;
 	for (int i = 0; i < cvector_size(graph);i++) {
-		char* c = graph[0][0];
-		char* c1 = graph[i][0];
+		c = graph[0][0];
+		c1 = graph[i][0];
 		if (!strcmp(c,c1)) {
 			cvector_vector_type(char*) line = NULL;
 
@@ -76,6 +78,9 @@ void StartSerchGraph() {
 
 			cvector_push_back(pathGraph, line);
 			cvector_push_back(useEdges, graph[i][1]);
+		}
+		else {
+			break;
 		}
 	}
 }
@@ -155,7 +160,8 @@ int main() {
 	StartSerchGraph();
 	SerchGraph();
 
-	printf("\nTime: %d sec.", time(NULL) - start);
+	printf("\nTime: %lld m.", (time(NULL) - start)/60);
+	printf(" or %lld s.", time(NULL) - start);
 
 	/*for (int i = 0; i < cvector_size(graph);i++) {
 		printf("%s ", graph[i][0]);
