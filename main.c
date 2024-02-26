@@ -6,8 +6,8 @@
 
 #define sizeB(a) (sizeof(a)/sizeof 0[a]) 
 
-cvector_vector_type(cvector_vector_type(char*)) pathGraph = NULL;
-cvector_vector_type(cvector_vector_type(char*)) graph = NULL;
+cvector_vector_type(cvector_vector_type(char)) *pathGraph = NULL;
+cvector_vector_type(cvector_vector_type(char)) *graph = NULL;
 cvector_vector_type(char*) useEdges = NULL;
 
 void ReadGraph() {
@@ -63,25 +63,10 @@ void ReadGraph() {
 
 void StartSerchGraph() {
 	int events = 0;
-	char* line = NULL;
-
 	for (int i = 0; i < cvector_size(graph);i++) {
-		events = 0;
-
-		if (cvector_size(graph[0][0]) == cvector_size(graph[i][0])) {
-			for (int j = 0; j < strlen(graph[0][0]); j++) {	//Проверка на совпадение
-				if (graph[i][0][j] != graph[0][0][j]) {
-					events = 1;
-					break;
-				}
-			}
-		}
-		else {
-			events = 1;
-		}
-		
-
-		if (events == 0) {
+		char* c = graph[0][0];
+		char* c1 = graph[i][0];
+		if (!strcmp(c,c1)) {
 			cvector_vector_type(char*) line = NULL;
 
 			cvector_push_back(line, graph[i][0]);
@@ -93,65 +78,45 @@ void StartSerchGraph() {
 	}
 }
 
-void SerchGraph() {
-	cvector_vector_type(cvector_vector_type(char*)) resPathGraph = NULL;
-	cvector_vector_type(char*) resUseEdges = useEdges;
+int SerchGraph() {
+	cvector_vector_type(cvector_vector_type(char)) *resPathGraph = NULL;
+	cvector_vector_type(char) *resUseEdges = useEdges;
 	int eventsUseEdges = 0;
-	int eventsUseEdges1 = 0;
-	int eventsCoinEdges = 0;
 
 	for (int i = 0; i < cvector_size(graph);i++) {
-		eventsUseEdges = 0;
+		for (int p = 0; p < cvector_size(pathGraph); p++) {
+			char* c = pathGraph[p][cvector_size(pathGraph[p]) - 1];
+			char* c1 = graph[i][0];
+			if (!strcmp(c, c1)) { //Проверка на совместимость вершин
+				eventsUseEdges = 0;
 
-		for (int u = 0; u < cvector_size(useEdges); u++) {//Проверяем на повторение 
-			if (useEdges[u] == graph[i][0]) {
-				eventsUseEdges = 1;
-				break;
-			}
-		}
-
-		if (eventsUseEdges == 0) {
-			for (int j = 0; j < cvector_size(pathGraph); j++) {
-				char* c = graph[i][0];
-				char* c1 = pathGraph[j][cvector_size(pathGraph[j]) - 1];
-				eventsCoinEdges = 0;
-				eventsUseEdges1 = 0;
-
-				for (int u = 0; u < cvector_size(pathGraph[j]); u++) {
-					if (strlen(graph[i][1]) == strlen(pathGraph[j][u])) {
-						for (int g = 0; g < strlen(graph[i][0]); g++) {
-							if (graph[i][1][g] == pathGraph[j][u][g]) {
-								eventsUseEdges1 = 1;
-								break;
-							}
-						}
+				for (int j = 0; j < cvector_size(pathGraph[p]);j++) {//Проверка на повторы в пути
+					c = pathGraph[p][j];
+					c1 = graph[i][1];
+					if (!strcmp(c, c1)) {
+						eventsUseEdges = 1;
 					}
 				}
 
-				if (eventsUseEdges1 == 0) {
-					if (strlen(c) == strlen(c1)) {
-						for (int g = 0; g < strlen(c); g++) {
-							if (c[g] != c1[g]) {
-								eventsCoinEdges = 1;
-								break;
-							}
-						}
+				if (eventsUseEdges == 0) {
+					cvector_vector_type(char)* line = NULL;
+					for (int j = 0; j < cvector_size(pathGraph[p]);j++) {//Добавляем путь в список
+						cvector_push_back(line, pathGraph[p][j]);
+						//printf("%s -> ", pathGraph[p][j]);
 					}
-					else {
-						eventsCoinEdges = 1;
-					}
+					//printf("%s\n", graph[i][1]);
+					cvector_push_back(line, graph[i][1]);
+					cvector_push_back(resPathGraph, line);
+					cvector_push_back(resUseEdges, graph[i][1]);
 
-
-					if (eventsCoinEdges == 0) {
-						cvector_vector_type(char*) line = NULL;
-						for (int g = 0; g < cvector_size(pathGraph[j]); g++) {
-							cvector_push_back(line, pathGraph[j][g]);
-							printf("%s -> ", pathGraph[j][g]);
+					c = graph[i][1];
+					c1 = graph[cvector_size(graph) - 1][0];
+					if (!strcmp(c, c1)) {
+						for (int j = 0; j < cvector_size(line);j++) {
+							printf("%s -> ", line[j]);
 						}
-						printf("%s\n", graph[i][1]);
-						cvector_push_back(line, graph[i][1]);
-						cvector_push_back(resPathGraph, line);
-						cvector_push_back(resUseEdges, graph[i][0]);
+
+						return 1;
 					}
 				}
 			}
@@ -160,12 +125,20 @@ void SerchGraph() {
 
 	pathGraph = resPathGraph;
 	useEdges = resUseEdges;
+	if (cvector_size(pathGraph) > 0) {
+		SerchGraph();
+	}
+
+	return 0;
 }
 
 int main() {
+	size_t start = time(NULL);
 	ReadGraph();
 	StartSerchGraph();
 	SerchGraph();
+
+	printf("\nTime: %d sec.", time(NULL) - start);
 
 	/*for (int i = 0; i < cvector_size(graph);i++) {
 		printf("%s ", graph[i][0]);
