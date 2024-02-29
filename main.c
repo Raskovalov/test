@@ -117,6 +117,7 @@ int SerchGraph() {
 					c1 = graph[i][1];
 					if (!strcmp(c, c1)) {
 						eventsUseEdges = 1;
+						break;
 					}
 				}
 
