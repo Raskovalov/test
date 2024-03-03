@@ -71,29 +71,20 @@ void ReadGraph() {
 			}
 			n++;
 		}
-		ind++;
 		cvector_push_back(graph, line);
-	}
-}
 
-void StartSerchGraph() {
-	int events = 0;
-	char* c = NULL;
-	char* c1 = NULL;
-	for (int i = 0; i < cvector_size(graph);i++) {
 		c = graph[0][0];
-		c1 = graph[i][0];
+		c1 = graph[ind][0];
 		if (!strcmp(c, c1)) {
 			cvector_vector_type(char*) line = NULL;
 
-			cvector_push_back(line, graph[i][0]);
-			cvector_push_back(line, graph[i][1]);
+			cvector_push_back(line, graph[ind][0]);
+			cvector_push_back(line, graph[ind][1]);
 
 			cvector_push_back(pathGraph, line);
 		}
-		else {
-			break;
-		}
+
+		ind++;
 	}
 }
 
@@ -108,6 +99,7 @@ int SerchGraph() {
 		for (int i = 0; i < cvector_size(graph);i++) {
 			c = pathGraph[p][cvector_size(pathGraph[p]) - 1];
 			c1 = graph[i][0];
+
 			if (!strcmp(c, c1)) { //Проверка на совместимость вершин
 				eventsUseEdges = 0;
 				eventEdges = 1;
@@ -147,8 +139,8 @@ int SerchGraph() {
 					eventEdges = 0;
 					break;
 				}
-				else {//Переход на нужный индекс
-					for (int j = 0; j < cvector_size(edges); j++) {
+				else {
+					for (int j = 0; j < cvector_size(edges); j++) {//Переход на нужный индекс
 						c1 = edges[j];
 						if (!strcmp(c, c1)) {
 							i = numberEdges[j];
@@ -170,12 +162,11 @@ int SerchGraph() {
 
 int main() {
 	size_t start = time(NULL);
+
 	ReadGraph();
-	StartSerchGraph();
 	SerchGraph();
 
-	printf("\nTime: %lld m.", (time(NULL) - start) / 60);
-	printf(" || %lld s.", time(NULL) - start);
+	printf("\nTime: %lld s.", time(NULL) - start);
 
 	/*for (int i = 0; i < cvector_size(edges); i++) {
 		printf("%s ", edges[i]);
